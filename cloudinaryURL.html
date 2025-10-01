@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cloudinary Upload + Get URL</title>
+</head>
+<body style="font-family:sans-serif; text-align:center; padding:20px;">
+  <h2>Upload Image to Cloudinary and Get URL</h2>
+
+  <input type="file" id="fileInput" accept="image/*" />
+  <button onclick="uploadImage()">Upload</button>
+
+  <div id="preview" style="margin-top:20px;"></div>
+  <div id="imageUrl" style="margin-top:20px; word-break:break-all;"></div>
+
+  <script>
+    async function uploadImage() {
+      const fileInput = document.getElementById("fileInput");
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Please select an image first!");
+        return;
+      }
+
+      const data = new FormData();
+      data.append("file", file);
+      data.append("upload_preset", "demo123"); // your preset
+
+      try {
+        const res = await fetch("https://api.cloudinary.com/v1_1/dgqukqntn/image/upload", {
+          method: "POST",
+          body: data,
+        });
+
+        const uploaded = await res.json();
+        const imageUrl = uploaded.secure_url;
+
+        console.log("Cloudinary URL:", imageUrl);
+
+        // Show uploaded image
+        document.getElementById("preview").innerHTML =
+          `<h3>Uploaded:</h3><img src="${imageUrl}" width="300" style="border-radius:8px;" />`;
+
+        // Show the URL
+        document.getElementById("imageUrl").innerHTML =
+          `<h3>Image URL:</h3><a href="${imageUrl}" target="_blank">${imageUrl}</a>`;
+
+      } catch (err) {
+        console.error("Upload error:", err);
+        alert("Failed to upload image.");
+      }
+    }
+  </script>
+</body>
+</html>
